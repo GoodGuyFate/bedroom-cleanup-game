@@ -1,0 +1,14 @@
+.room {
+  position: relative;
+  width: 800px;
+  height: 600px;
+  border: 5px solid white;
+  background-color: #d2b48c;
+}
+
+.square {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background-color: white;
+}
