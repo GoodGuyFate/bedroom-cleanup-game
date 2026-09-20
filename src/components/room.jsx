@@ -17,7 +17,7 @@ export default function Room() {
     offsets.current.y = yOffset;
     dragInProgress.current = true;
 
-    e.currentTarget.setPointerCapture(e.pointerId)
+    e.currentTarget.setPointerCapture(e.pointerId);
     // console.log(roomRef.current);
   };
 
@@ -36,8 +36,13 @@ export default function Room() {
     const roomRect = roomRef.current.getBoundingClientRect();
     // console.log(roomRect);
 
-    const newX = e.clientX - roomRect.left - offsets.current.x;
-    const newY = e.clientY - roomRect.top - offsets.current.y;
+    const newX =
+      e.clientX -
+      roomRect.left -
+      roomRef.current.clientLeft -
+      offsets.current.x;
+    const newY =
+      e.clientY - roomRect.top - roomRef.current.clientTop - offsets.current.y;
 
     setPos({
       x: newX,
