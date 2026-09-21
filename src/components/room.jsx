@@ -44,9 +44,14 @@ export default function Room() {
     const newY =
       e.clientY - roomRect.top - roomRef.current.clientTop - offsets.current.y;
 
+    const maxX = roomRef.current.clientWidth - e.currentTarget.offsetWidth
+    const maxY = roomRef.current.clientHeight - e.currentTarget.offsetHeight
+    const clampedX = Math.min(Math.max(newX, 0), maxX)
+    const clampedY = Math.min(Math.max(newY, 0), maxY)
+
     setPos({
-      x: newX,
-      y: newY,
+      x: clampedX,
+      y: clampedY,
     });
   };
 
