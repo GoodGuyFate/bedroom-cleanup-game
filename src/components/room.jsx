@@ -1,8 +1,29 @@
 import "./room.css";
 import { useState, useRef } from "react";
 
+const furniture = [
+  {
+    id: 1,
+    name: "bed",
+    width: 200,
+    height: 100,
+    color: "blue",
+    curPos: { x: 100, y: 100 },
+    targetPos: { x: 300, y: 300 },
+  },
+  {
+    id: 2,
+    name: "desk",
+    width: 100,
+    height: 50,
+    color: "red",
+    curPos: { x: 50, y: 50 },
+    targetPos: { x: 150, y: 150 },
+  },
+];
+
 export default function Room() {
-  const [pos, setPos] = useState({ x: 100, y: 100 });
+  const [items, setItems] = useState(furniture);
   const offsets = useRef({ x: 0, y: 0 });
   const dragInProgress = useRef(false);
   const roomRef = useRef(null);
@@ -44,10 +65,10 @@ export default function Room() {
     const newY =
       e.clientY - roomRect.top - roomRef.current.clientTop - offsets.current.y;
 
-    const maxX = roomRef.current.clientWidth - e.currentTarget.offsetWidth
-    const maxY = roomRef.current.clientHeight - e.currentTarget.offsetHeight
-    const clampedX = Math.min(Math.max(newX, 0), maxX)
-    const clampedY = Math.min(Math.max(newY, 0), maxY)
+    const maxX = roomRef.current.clientWidth - e.currentTarget.offsetWidth;
+    const maxY = roomRef.current.clientHeight - e.currentTarget.offsetHeight;
+    const clampedX = Math.min(Math.max(newX, 0), maxX);
+    const clampedY = Math.min(Math.max(newY, 0), maxY);
 
     setPos({
       x: clampedX,
@@ -58,16 +79,21 @@ export default function Room() {
   return (
     <div className="room" ref={roomRef}>
       room{" "}
-      <div
-        className="square"
-        style={{ left: pos.x, top: pos.y }}
-        onPointerDown={handlePointerDown}
-        onPointerUp={handlePointerUp}
-        onPointerMove={handlePointerMove}
-        onPointerCancel={handlePointerUp}
-      >
-        square
-      </div>
+      {items.map((item) => (
+        <div
+          key={item.id}
+          className="square"
+          style={{
+            left: item.curPos.x,
+            top: item.curPos.y,
+            width: item.width,
+            height: item.height,
+            backgroundColor: item.color,
+          }}
+        >
+          {item.name}
+        </div>
+      ))}
     </div>
   );
 }
