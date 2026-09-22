@@ -25,10 +25,10 @@ const furniture = [
 export default function Room() {
   const [items, setItems] = useState(furniture);
   const offsets = useRef({ x: 0, y: 0 });
-  const dragInProgress = useRef(false);
+  const draggedId = useRef(null);
   const roomRef = useRef(null);
 
-  const handlePointerDown = (e) => {
+  const handlePointerDown = (e, itemId) => {
     const rect = e.currentTarget.getBoundingClientRect();
 
     // console.log(rect);
@@ -36,7 +36,7 @@ export default function Room() {
     const yOffset = e.clientY - rect.top;
     offsets.current.x = xOffset;
     offsets.current.y = yOffset;
-    dragInProgress.current = true;
+    draggedId.current = itemId;
 
     e.currentTarget.setPointerCapture(e.pointerId);
     // console.log(roomRef.current);
@@ -45,12 +45,12 @@ export default function Room() {
   const handlePointerUp = () => {
     // console.log(offsets.current);
     // console.log(dragInProgress.current);
-    dragInProgress.current = false;
+    draggedId.current = null;
     // console.log(dragInProgress.current);
   };
 
   const handlePointerMove = (e) => {
-    if (dragInProgress.current == false) {
+    if (draggedId.current == null) {
       return;
     }
 
@@ -69,11 +69,16 @@ export default function Room() {
     const maxY = roomRef.current.clientHeight - e.currentTarget.offsetHeight;
     const clampedX = Math.min(Math.max(newX, 0), maxX);
     const clampedY = Math.min(Math.max(newY, 0), maxY);
+    const draggingId = draggedId.current;
 
-    setPos({
-      x: clampedX,
-      y: clampedY,
-    });
+    setItems((prevItems) =>
+      prevItems.map((item) => {
+        if (item.id === draggingId) {
+          return { ...item, curPos: { x: clampedX, y: clampedY } };
+        }
+        return item;
+      }),
+    );
   };
 
   return (
@@ -90,6 +95,10 @@ export default function Room() {
             height: item.height,
             backgroundColor: item.color,
           }}
+          onPointerDown={(e) => handlePointerDown(e, item.id)}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
         >
           {item.name}
         </div>
