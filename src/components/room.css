@@ -6,11 +6,18 @@
   background-color: #d2b48c;
 }
 
-.square {
+.furniture-item{
   position: absolute;
   /* width: 200px; */
   /* height: 200px; */
   /* background-color: white; */
   user-select: none;
   touch-action: none;
+}
+
+.target-outline {
+  position: absolute;
+  background: none;
+  border: 5px solid rgb(52, 52, 52);
+  pointer-events: none;
 }

@@ -20,6 +20,15 @@ const furniture = [
     curPos: { x: 50, y: 50 },
     targetPos: { x: 150, y: 150 },
   },
+  {
+    id: 3,
+    name: "lamp",
+    width: 50,
+    height: 50,
+    color: "brown",
+    curPos: { x: 10, y: 120 },
+    targetPos: { x: 120, y: 10 },
+  },
 ];
 
 export default function Room() {
@@ -87,7 +96,20 @@ export default function Room() {
       {items.map((item) => (
         <div
           key={item.id}
-          className="square"
+          className="target-outline"
+          style={{
+            left: item.targetPos.x,
+            top: item.targetPos.y,
+            width: item.width,
+            height: item.height,
+          }}
+        >
+        </div>
+      ))}
+      {items.map((item) => (
+        <div
+          key={item.id}
+          className="furniture-item"
           style={{
             left: item.curPos.x,
             top: item.curPos.y,
