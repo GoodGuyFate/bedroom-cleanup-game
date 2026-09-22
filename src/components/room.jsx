@@ -31,6 +31,13 @@ const furniture = [
   },
 ];
 
+function isCloseEnough(posA, posB, tolerance) {
+  return (
+    Math.abs(posA.x - posB.x) <= tolerance &&
+    Math.abs(posA.y - posB.y) <= tolerance
+  );
+}
+
 export default function Room() {
   const [items, setItems] = useState(furniture);
   const offsets = useRef({ x: 0, y: 0 });
@@ -52,10 +59,22 @@ export default function Room() {
   };
 
   const handlePointerUp = () => {
-    // console.log(offsets.current);
-    // console.log(dragInProgress.current);
+    const draggingId = draggedId.current;
+    const i = items.find((item) => item.id === draggingId);
+    if (isCloseEnough(i.curPos, i.targetPos, 20)) {
+      setItems((prevItems) =>
+        prevItems.map((item) => {
+          if (item.id === draggingId) {
+            return {
+              ...item,
+              curPos: { x: item.targetPos.x, y: item.targetPos.y },
+            };
+          }
+          return item;
+        }),
+      );
+    }
     draggedId.current = null;
-    // console.log(dragInProgress.current);
   };
 
   const handlePointerMove = (e) => {
@@ -103,8 +122,7 @@ export default function Room() {
             width: item.width,
             height: item.height,
           }}
-        >
-        </div>
+        ></div>
       ))}
       {items.map((item) => (
         <div
