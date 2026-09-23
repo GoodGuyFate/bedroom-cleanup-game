@@ -38,8 +38,15 @@ function isCloseEnough(posA, posB, tolerance) {
   );
 }
 
+function allPlaced(items, tolerance) {
+  return items.every((item) =>
+    isCloseEnough(item.curPos, item.targetPos, tolerance),
+  );
+}
+
 export default function Room() {
   const [items, setItems] = useState(furniture);
+  const [hasWon, setHasWon] = useState(false);
   const offsets = useRef({ x: 0, y: 0 });
   const draggedId = useRef(null);
   const roomRef = useRef(null);
@@ -62,8 +69,8 @@ export default function Room() {
     const draggingId = draggedId.current;
     const i = items.find((item) => item.id === draggingId);
     if (isCloseEnough(i.curPos, i.targetPos, 20)) {
-      setItems((prevItems) =>
-        prevItems.map((item) => {
+      setItems((prevItems) => {
+        const newItems = prevItems.map((item) => {
           if (item.id === draggingId) {
             return {
               ...item,
@@ -71,8 +78,12 @@ export default function Room() {
             };
           }
           return item;
-        }),
-      );
+        });
+        if (allPlaced(newItems, 20)) {
+          setHasWon(true);
+        }
+        return newItems;
+      });
     }
     draggedId.current = null;
   };
@@ -143,6 +154,7 @@ export default function Room() {
           {item.name}
         </div>
       ))}
+      {hasWon && <div className="win-message">You win!</div>}
     </div>
   );
 }
