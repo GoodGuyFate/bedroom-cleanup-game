@@ -1,35 +1,6 @@
 import "./room.css";
 import { useState, useRef } from "react";
-
-const furniture = [
-  {
-    id: 1,
-    name: "bed",
-    width: 200,
-    height: 100,
-    color: "blue",
-    curPos: { x: 100, y: 100 },
-    targetPos: { x: 300, y: 300 },
-  },
-  {
-    id: 2,
-    name: "desk",
-    width: 100,
-    height: 50,
-    color: "red",
-    curPos: { x: 50, y: 50 },
-    targetPos: { x: 150, y: 150 },
-  },
-  {
-    id: 3,
-    name: "lamp",
-    width: 50,
-    height: 50,
-    color: "brown",
-    curPos: { x: 10, y: 120 },
-    targetPos: { x: 120, y: 10 },
-  },
-];
+import { furniture } from "../data/furniture";
 
 function isCloseEnough(posA, posB, tolerance) {
   return (
@@ -44,9 +15,27 @@ function allPlaced(items, tolerance) {
   );
 }
 
+function rectsOverlap(itemA, itemB) {
+  const aLeft = itemA.curPos.x;
+  const aRight = itemA.curPos.x + itemA.width;
+  const aTop = itemA.curPos.y;
+  const aBottom = itemA.curPos.y + itemA.height;
+
+  const bLeft = itemB.curPos.x;
+  const bRight = itemB.curPos.x + itemB.width;
+  const bTop = itemB.curPos.y;
+  const bBottom = itemB.curPos.y + itemB.height;
+
+  const xOverlap = aLeft < bRight && aRight > bLeft;
+  const yOverlap = aTop < bBottom && aBottom > bTop;
+
+  return xOverlap && yOverlap;
+}
+
 export default function Room() {
   const [items, setItems] = useState(furniture);
-  const [hasWon, setHasWon] = useState(false);
+  // const [hasWon, setHasWon] = useState(false)
+  const hasWon = allPlaced(items, 20);
   const offsets = useRef({ x: 0, y: 0 });
   const draggedId = useRef(null);
   const roomRef = useRef(null);
@@ -79,9 +68,9 @@ export default function Room() {
           }
           return item;
         });
-        if (allPlaced(newItems, 20)) {
-          setHasWon(true);
-        }
+        // if (allPlaced(newItems, 20)) {
+        //   setHasWon(true);
+        // }
         return newItems;
       });
     }
