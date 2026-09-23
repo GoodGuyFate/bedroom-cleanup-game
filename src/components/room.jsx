@@ -2,6 +2,9 @@ import "./room.css";
 import { useState, useRef } from "react";
 import { furniture } from "../data/furniture";
 
+const ROOM_WIDTH = 790;
+const ROOM_HEIGHT = 590;
+
 function isCloseEnough(posA, posB, tolerance) {
   return (
     Math.abs(posA.x - posB.x) <= tolerance &&
@@ -32,8 +35,41 @@ function rectsOverlap(itemA, itemB) {
   return xOverlap && yOverlap;
 }
 
+function randomPosition(itemWidth, itemHeight, roomWidth, roomHeight) {
+  const maxX = roomWidth - itemWidth;
+  const maxY = roomHeight - itemHeight;
+
+  const x = Math.floor(Math.random() * (maxX + 1));
+  const y = Math.floor(Math.random() * (maxY + 1));
+
+  return { x, y };
+}
+
+function randomizeLayout(items, roomWidth, roomHeight) {
+  const placed = [];
+
+  for (const item of items) {
+    let pos = randomPosition(item.width, item.height, roomWidth, roomHeight);
+
+    while (
+      placed.some((p) =>
+        rectsOverlap(
+          { curPos: pos, width: item.width, height: item.height },
+          p,
+        ),
+      )
+    ) {
+      pos = randomPosition(item.width, item.height, roomWidth, roomHeight);
+    }
+
+    placed.push({ ...item, curPos: pos });
+  }
+
+  return placed;
+}
+
 export default function Room() {
-  const [items, setItems] = useState(furniture);
+  const [items, setItems] = useState(() => randomizeLayout(furniture, ROOM_WIDTH, ROOM_HEIGHT));
   // const [hasWon, setHasWon] = useState(false)
   const hasWon = allPlaced(items, 20);
   const offsets = useRef({ x: 0, y: 0 });
