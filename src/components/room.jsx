@@ -69,12 +69,15 @@ function randomizeLayout(items, roomWidth, roomHeight) {
 }
 
 export default function Room() {
-  const [items, setItems] = useState(() => randomizeLayout(furniture, ROOM_WIDTH, ROOM_HEIGHT));
+  const [items, setItems] = useState(() =>
+    randomizeLayout(furniture, ROOM_WIDTH, ROOM_HEIGHT),
+  );
   // const [hasWon, setHasWon] = useState(false)
   const hasWon = allPlaced(items, 20);
   const offsets = useRef({ x: 0, y: 0 });
   const draggedId = useRef(null);
   const roomRef = useRef(null);
+  const [topId, setTopId] = useState(null);
 
   const handlePointerDown = (e, itemId) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -85,6 +88,7 @@ export default function Room() {
     offsets.current.x = xOffset;
     offsets.current.y = yOffset;
     draggedId.current = itemId;
+    setTopId(itemId);
 
     e.currentTarget.setPointerCapture(e.pointerId);
     // console.log(roomRef.current);
@@ -170,6 +174,7 @@ export default function Room() {
             width: item.width,
             height: item.height,
             backgroundColor: item.color,
+            zIndex: item.id === topId ? 1 : 0,
           }}
           onPointerDown={(e) => handlePointerDown(e, item.id)}
           onPointerMove={handlePointerMove}
