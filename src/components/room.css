@@ -3,21 +3,52 @@
   width: 800px;
   height: 600px;
   border: 5px solid white;
-  background-color: #d2b48c;
+  background-color: #c19a6b;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.08) 0px,
+      rgba(0, 0, 0, 0.08) 2px,
+      transparent 2px,
+      transparent 90px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.04) 0px,
+      rgba(255, 255, 255, 0.04) 45px,
+      transparent 45px,
+      transparent 90px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.03) 0px,
+      rgba(0, 0, 0, 0.03) 30px,
+      transparent 30px,
+      transparent 210px
+    );
+    
 }
 
-.furniture-item{
+.furniture-item {
   position: absolute;
-  /* width: 200px; */
-  /* height: 200px; */
-  /* background-color: white; */
   user-select: none;
   touch-action: none;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 .target-outline {
   position: absolute;
-  background: none;
-  border: 5px solid rgb(52, 52, 52);
+  background: rgba(255, 255, 255, 0.15);
+  border: 3px dashed rgb(52, 52, 52);
   pointer-events: none;
 }

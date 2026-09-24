@@ -1,6 +1,7 @@
 import "./room.css";
 import { useState, useRef } from "react";
 import { furniture } from "../data/furniture";
+import { layouts } from "../data/layouts";
 
 const ROOM_WIDTH = 790;
 const ROOM_HEIGHT = 590;
@@ -68,10 +69,20 @@ function randomizeLayout(items, roomWidth, roomHeight) {
   return placed;
 }
 
+function applyLayout(catalog, layout) {
+  return catalog.map((item) => {
+    return { ...item, targetPos: layout[item.id] };
+  });
+}
+
 export default function Room() {
-  const [items, setItems] = useState(() =>
-    randomizeLayout(furniture, ROOM_WIDTH, ROOM_HEIGHT),
-  );
+  const [items, setItems] = useState(() => {
+    const randomLayout = Math.floor(Math.random() * layouts.length);
+    const chosenLayout = layouts[randomLayout];
+    const itemsWithTargetPos = applyLayout(furniture, chosenLayout);
+    return randomizeLayout(itemsWithTargetPos, ROOM_WIDTH, ROOM_HEIGHT);
+  });
+
   // const [hasWon, setHasWon] = useState(false)
   const hasWon = allPlaced(items, 20);
   const offsets = useRef({ x: 0, y: 0 });
