@@ -1,5 +1,5 @@
 import "./room.css";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { furniture } from "../data/furniture";
 import { layouts } from "../data/layouts";
 
@@ -75,20 +75,59 @@ function applyLayout(catalog, layout) {
   });
 }
 
-export default function Room() {
-  const [items, setItems] = useState(() => {
-    const randomLayout = Math.floor(Math.random() * layouts.length);
-    const chosenLayout = layouts[randomLayout];
-    const itemsWithTargetPos = applyLayout(furniture, chosenLayout);
-    return randomizeLayout(itemsWithTargetPos, ROOM_WIDTH, ROOM_HEIGHT);
-  });
+function generateRandomLayout() {
+  const randomLayout = Math.floor(Math.random() * layouts.length);
+  const chosenLayout = layouts[randomLayout];
+  const itemsWithTargetPos = applyLayout(furniture, chosenLayout);
+  return randomizeLayout(itemsWithTargetPos, ROOM_WIDTH, ROOM_HEIGHT);
+}
 
+export default function Room() {
+  const [items, setItems] = useState(generateRandomLayout);
   // const [hasWon, setHasWon] = useState(false)
   const hasWon = allPlaced(items, 20);
   const offsets = useRef({ x: 0, y: 0 });
   const draggedId = useRef(null);
   const roomRef = useRef(null);
   const [topId, setTopId] = useState(null);
+  const [phase, setPhase] = useState("idle");
+  const [count, setCount] = useState(3);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    if (phase !== "countdown") return;
+
+    const intervalId = setInterval(() => {
+      setCount((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalId);
+          setPhase("playing");
+          return 3;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "playing") return;
+
+    const intervalId = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalId);
+          setPhase("ended");
+          return 60;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [phase]);
 
   const handlePointerDown = (e, itemId) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -119,9 +158,11 @@ export default function Room() {
           }
           return item;
         });
-        // if (allPlaced(newItems, 20)) {
-        //   setHasWon(true);
-        // }
+
+        if (allPlaced(newItems, 20)) {
+          setScore((prev) => prev + 1)
+          return generateRandomLayout()
+        }
         return newItems;
       });
     }
@@ -161,41 +202,60 @@ export default function Room() {
   };
 
   return (
-    <div className="room" ref={roomRef}>
-      room{" "}
-      {items.map((item) => (
-        <div
-          key={item.id}
-          className="target-outline"
-          style={{
-            left: item.targetPos.x,
-            top: item.targetPos.y,
-            width: item.width,
-            height: item.height,
-          }}
-        ></div>
-      ))}
-      {items.map((item) => (
-        <div
-          key={item.id}
-          className="furniture-item"
-          style={{
-            left: item.curPos.x,
-            top: item.curPos.y,
-            width: item.width,
-            height: item.height,
-            backgroundColor: item.color,
-            zIndex: item.id === topId ? 1 : 0,
-          }}
-          onPointerDown={(e) => handlePointerDown(e, item.id)}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-        >
-          {item.name}
+    <>
+      <div
+        className="room"
+        ref={roomRef}
+        style={{ filter: phase === "playing" ? "none" : "blur(4px)" }}
+      >
+        room{" "}
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="target-outline"
+            style={{
+              left: item.targetPos.x,
+              top: item.targetPos.y,
+              width: item.width,
+              height: item.height,
+            }}
+          ></div>
+        ))}
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="furniture-item"
+            style={{
+              left: item.curPos.x,
+              top: item.curPos.y,
+              width: item.width,
+              height: item.height,
+              backgroundColor: item.color,
+              zIndex: item.id === topId ? 1 : 0,
+            }}
+            onPointerDown={(e) => handlePointerDown(e, item.id)}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+          >
+            {item.name}
+          </div>
+        ))}
+        {phase === "playing" && <div>{timeLeft}</div>}
+        {hasWon && <div className="win-message">You win!</div>}
+      </div>
+
+      {phase !== "playing" && (
+        <div className="game-overlay">
+          {phase === "idle" && (
+            <button onClick={() => setPhase("countdown")}>Start</button>
+          )}
+          {phase === "countdown" && <div>{count}</div>}
+          {phase === "ended" && (
+            <div>Game over! You'll add score here later.</div>
+          )}
         </div>
-      ))}
-      {hasWon && <div className="win-message">You win!</div>}
-    </div>
+      )}
+    </>
   );
 }
