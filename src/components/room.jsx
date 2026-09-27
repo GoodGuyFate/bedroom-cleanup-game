@@ -92,7 +92,7 @@ export default function Room() {
   const [topId, setTopId] = useState(null);
   const [phase, setPhase] = useState("idle");
   const [count, setCount] = useState(3);
-  const [timeLeft, setTimeLeft] = useState(60);
+  const [timeLeft, setTimeLeft] = useState(10);
   const [score, setScore] = useState(0);
 
   useEffect(() => {
@@ -120,7 +120,7 @@ export default function Room() {
         if (prev <= 1) {
           clearInterval(intervalId);
           setPhase("ended");
-          return 60;
+          return 10;
         }
         return prev - 1;
       });
@@ -203,6 +203,12 @@ export default function Room() {
     );
   };
 
+  const handlePlayAgain = () => {
+    setScore(0)
+    setItems(generateRandomLayout())
+    setPhase("countdown")
+  }
+
   return (
     <>
       <div
@@ -259,7 +265,12 @@ export default function Room() {
           )}
           {phase === "countdown" && <div>{count}</div>}
           {phase === "ended" && (
-            <div>Game over! You'll add score here later.</div>
+            <div>
+              <div>
+                Time's up! You cleared {score} room{score !== 1 ? "s" : ""}.
+              </div>
+              <button onClick={handlePlayAgain}>Play Again</button>
+            </div>
           )}
         </div>
       )}
