@@ -262,7 +262,7 @@ export default function Room() {
             {item.name}
           </div>
         ))}
-        {hasWon && <div className="win-message">You win!</div>}
+        {hasWon && <div className="win-message"></div>}
       </div>
 
       {phase !== "playing" && (
