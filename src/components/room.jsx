@@ -92,8 +92,14 @@ export default function Room() {
   const [topId, setTopId] = useState(null);
   const [phase, setPhase] = useState("idle");
   const [count, setCount] = useState(3);
-  const [timeLeft, setTimeLeft] = useState(10);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [score, setScore] = useState(0);
+  const localStorageHighScore = Number(
+    localStorage.getItem("roomCleanerHighScore"),
+  );
+  const [highScore, setHighScore] = useState(() => {
+    return localStorageHighScore;
+  });
 
   useEffect(() => {
     if (phase !== "countdown") return;
@@ -120,7 +126,7 @@ export default function Room() {
         if (prev <= 1) {
           clearInterval(intervalId);
           setPhase("ended");
-          return 10;
+          return 60;
         }
         return prev - 1;
       });
@@ -128,6 +134,10 @@ export default function Room() {
 
     return () => clearInterval(intervalId);
   }, [phase]);
+
+  useEffect(() => {
+    localStorage.setItem("roomCleanerHighScore", highScore.toString());
+  }, [highScore]);
 
   const handlePointerDown = (e, itemId) => {
     if (phase !== "playing") return;
@@ -162,7 +172,11 @@ export default function Room() {
       });
 
       if (allPlaced(newItems, 20)) {
-        setScore((prev) => prev + 1);
+        const newScore = score + 1;
+        setScore(newScore);
+        if (newScore > highScore) {
+          setHighScore(newScore);
+        }
         setItems(generateRandomLayout());
       } else {
         setItems(newItems);
@@ -204,10 +218,10 @@ export default function Room() {
   };
 
   const handlePlayAgain = () => {
-    setScore(0)
-    setItems(generateRandomLayout())
-    setPhase("countdown")
-  }
+    setScore(0);
+    setItems(generateRandomLayout());
+    setPhase("countdown");
+  };
 
   return (
     <>
@@ -216,7 +230,6 @@ export default function Room() {
         ref={roomRef}
         style={{ filter: phase === "playing" ? "none" : "blur(4px)" }}
       >
-        room{" "}
         {items.map((item) => (
           <div
             key={item.id}
@@ -249,31 +262,54 @@ export default function Room() {
             {item.name}
           </div>
         ))}
-        {phase === "playing" && (
-          <>
-            <div>{timeLeft}</div>
-            <div>Score: {score}</div>
-          </>
-        )}
         {hasWon && <div className="win-message">You win!</div>}
       </div>
 
       {phase !== "playing" && (
         <div className="game-overlay">
           {phase === "idle" && (
-            <button onClick={() => setPhase("countdown")}>Start</button>
+            <div className="overlay-card">
+              <div className="overlay-title">Room Cleaner</div>
+              <p className="overlay-subtitle">
+                Drag each piece of furniture onto its matching outline. Clear as
+                many rooms as you can in 60 seconds!
+              </p>
+              <div className="overlay-stat">High Score: {highScore}</div>
+              <button
+                className="overlay-button"
+                onClick={() => setPhase("countdown")}
+              >
+                Start
+              </button>
+            </div>
           )}
-          {phase === "countdown" && <div>{count}</div>}
+
+          {phase === "countdown" && (
+            <div className="overlay-countdown">{count}</div>
+          )}
+
           {phase === "ended" && (
-            <div>
-              <div>
-                Time's up! You cleared {score} room{score !== 1 ? "s" : ""}.
-              </div>
-              <button onClick={handlePlayAgain}>Play Again</button>
+            <div className="overlay-card">
+              <div className="overlay-title">Time's Up!</div>
+              <p className="overlay-subtitle">
+                You cleared {score} room{score !== 1 ? "s" : ""}.
+              </p>
+              <div className="overlay-stat">High Score: {highScore}</div>
+              <button className="overlay-button" onClick={handlePlayAgain}>
+                Play Again
+              </button>
             </div>
           )}
         </div>
       )}
+
+      <div className="hud">
+        <div>High Score: {highScore}</div>
+        {(phase === "playing" || phase === "ended") && (
+          <div>Score: {score}</div>
+        )}
+        {phase === "playing" && <div>Time: {timeLeft}</div>}
+      </div>
     </>
   );
 }

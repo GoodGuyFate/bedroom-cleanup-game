@@ -4,6 +4,8 @@
   height: 600px;
   border: 5px solid white;
   background-color: #c19a6b;
+  user-select: none;
+  -webkit-user-drag: none;
   background-image:
     repeating-linear-gradient(
       90deg,
@@ -26,7 +28,6 @@
       transparent 30px,
       transparent 210px
     );
-    
 }
 
 .furniture-item {
@@ -60,4 +61,86 @@
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.3);
+}
+
+.hud {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  gap: 16px;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  color: white;
+  font-family: sans-serif;
+  font-weight: 600;
+  z-index: 10;
+}
+
+.overlay-card {
+  background: #d2b48c;
+  border: 3px solid #3a2a1a;
+  border-radius: 16px;
+  padding: 32px 40px;
+  min-width: 320px;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  color: #2a1d12;
+  font-family: sans-serif;
+}
+
+.overlay-title {
+  font-size: 26px;
+  font-weight: 800;
+  margin: 0 0 10px;
+  color: #2a1d12;
+}
+
+.overlay-subtitle {
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0 0 22px;
+  color: #4a3623;
+}
+
+.overlay-stat {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 4px 0;
+}
+
+.overlay-button {
+  margin-top: 18px;
+  padding: 12px 32px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: sans-serif;
+  color: white;
+  background: #4a6b6b;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition:
+    transform 0.12s ease,
+    background 0.12s ease;
+}
+
+.overlay-button:hover {
+  background: #5a7f7f;
+  transform: translateY(-2px);
+}
+
+.overlay-button:active {
+  transform: translateY(0);
+}
+
+.overlay-countdown {
+  font-size: 72px;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  font-family: sans-serif;
 }
