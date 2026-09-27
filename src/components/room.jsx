@@ -130,6 +130,8 @@ export default function Room() {
   }, [phase]);
 
   const handlePointerDown = (e, itemId) => {
+    if (phase !== "playing") return;
+
     const rect = e.currentTarget.getBoundingClientRect();
 
     // console.log(rect);
@@ -147,24 +149,24 @@ export default function Room() {
   const handlePointerUp = () => {
     const draggingId = draggedId.current;
     const i = items.find((item) => item.id === draggingId);
-    if (isCloseEnough(i.curPos, i.targetPos, 20)) {
-      setItems((prevItems) => {
-        const newItems = prevItems.map((item) => {
-          if (item.id === draggingId) {
-            return {
-              ...item,
-              curPos: { x: item.targetPos.x, y: item.targetPos.y },
-            };
-          }
-          return item;
-        });
 
-        if (allPlaced(newItems, 20)) {
-          setScore((prev) => prev + 1)
-          return generateRandomLayout()
+    if (isCloseEnough(i.curPos, i.targetPos, 20)) {
+      const newItems = items.map((item) => {
+        if (item.id === draggingId) {
+          return {
+            ...item,
+            curPos: { x: item.targetPos.x, y: item.targetPos.y },
+          };
         }
-        return newItems;
+        return item;
       });
+
+      if (allPlaced(newItems, 20)) {
+        setScore((prev) => prev + 1);
+        setItems(generateRandomLayout());
+      } else {
+        setItems(newItems);
+      }
     }
     draggedId.current = null;
   };
@@ -241,7 +243,12 @@ export default function Room() {
             {item.name}
           </div>
         ))}
-        {phase === "playing" && <div>{timeLeft}</div>}
+        {phase === "playing" && (
+          <>
+            <div>{timeLeft}</div>
+            <div>Score: {score}</div>
+          </>
+        )}
         {hasWon && <div className="win-message">You win!</div>}
       </div>
 
