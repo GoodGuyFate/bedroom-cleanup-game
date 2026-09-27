@@ -1,16 +1,31 @@
-# React + Vite
+# Room Cleaner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A top down room tidying game built with React and Vite. Drag furniture onto its matching outline before the timer runs out.
 
-Currently, two official plugins are available:
+## How to play
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Press Start, wait for the countdown, then drag each piece of furniture onto its dashed outline.
+- Once a piece is close enough to its target, it snaps into place.
+- Clear as many rooms as you can before the 60-second timer runs out.
+- Your best score is saved locally and shown as your high score on future visits.
 
-## React Compiler
+## Tech
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React + Vite
+- CSS
+- Game state lives in React state and `localStorage`
 
-## Expanding the ESLint configuration
+## Notable implementation details
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Drag and drop** is built from scratch using the Pointer Events API rather than the browser's native drag and drop API, with `setPointerCapture` used so fast drags and releases outside the drop target are handled correctly.
+- **Coordinate math** converts between viewport coordinates (from pointer events) and room local coordinates (for rendering), accounting for the room's border width via `clientLeft`/`clientTop`.
+- **Layout data is separated from furniture data.** A furniture "catalog" (id, size, color, name) is combined at runtime with one of several handmade "layouts" (target positions only), so new room designs can be added without touching the game logic.
+- **Random starting positions** are generated with simple rejection sampling: each item is placed at a random spot and rerolled if it overlaps anything already placed, guaranteeing no overlaps at spawn.
+- **Game state** (idle, countdown, playing, ended) is modeled as a single state value rather than several booleans, to avoid states that could contradict each other.
+
+## Running locally
+
+```bash
+npm install
+npm run dev
+```
